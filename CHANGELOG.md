@@ -6,6 +6,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 - Linkexport für freigegebene Dateien unter PHP 8 wiederhergestellt
 - „Links exportieren“ in der Share-Ansicht exportiert wieder alle freigegebenen Dateien
+- Gewählte Sprache beim Anmelden und auf den Folgeseiten beibehalten
 - Docker-Basisimage auf PHP 8.4 festgelegt und Container-Build auf natives AMD64 und ARM64 umgestellt
 - Versioniertes Container-Image auch im regulären PHPGUI-Paket veröffentlicht
 - README und Dependabot-Konfiguration für das Legacy-Repository angepasst

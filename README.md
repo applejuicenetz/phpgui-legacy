@@ -55,7 +55,7 @@ Zusätzlich kann manuell der URL-Parameter `&tab=NAME_DES_TAB` hinzugefügt werd
 
 ### docker run
 
-Der Legacy-Container ist unter `ghcr.io/applejuicenetz/phpgui-legacy:0.28.2` und als versionierter Tag im regulären Paket `ghcr.io/applejuicenetz/phpgui:0.28.2` verfügbar.
+Der feste Release-Stand ist unter `ghcr.io/applejuicenetz/phpgui-legacy:0.28.2` und im regulären Paket unter `ghcr.io/applejuicenetz/phpgui:0.28.2` verfügbar. Der aktuelle Stand von `main` wird in beiden Paketen als `:legacy` veröffentlicht.
 
 Container starten:
 

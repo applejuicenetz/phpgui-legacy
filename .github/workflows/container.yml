@@ -6,47 +6,149 @@ on:
       - main
   release:
     types: [ released ]
+  workflow_dispatch:
 
 jobs:
-  container:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - platform: linux/amd64
+            arch: amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
+
+      - name: Use PHP 8.4 base image
+        run: sed -i 's|^FROM php:8-apache$|FROM php:8.4-apache|' Dockerfile
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v6
         with:
-          images: ${{ github.repository }},ghcr.io/${{ github.repository }}
+          images: |
+            ghcr.io/${{ github.repository }}
+            docker.io/${{ github.repository }}
           labels: |
             org.opencontainers.image.vendor=appleJuiceNETZ
             org.opencontainers.image.url=https://applejuicenet.cc
 
-      - name: Login to ghcr.io
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USER }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v4
 
-      - name: Build and push
-        uses: docker/build-push-action@v4
+      - name: Build and push ${{ matrix.platform }} by digest
+        id: build
+        uses: docker/build-push-action@v7
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/386,linux/arm
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: ${{ matrix.platform }}
+          provenance: false
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=legacy-${{ matrix.arch }}
+          cache-to: type=gha,scope=legacy-${{ matrix.arch }},mode=max
+          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export image digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p /tmp/digests
+          test -n "$DIGEST"
+          touch "/tmp/digests/${DIGEST#sha256:}"
+
+      - name: Upload image digest
+        uses: actions/upload-artifact@v7
+        with:
+          name: digests-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    env:
+      DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+      DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
+    steps:
+      - name: Download image digests
+        uses: actions/download-artifact@v8
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Login to ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Login to Docker Hub
+        if: env.DOCKER_HUB_USER != '' && env.DOCKER_HUB_TOKEN != ''
+        uses: docker/login-action@v4
+        with:
+          username: ${{ env.DOCKER_HUB_USER }}
+          password: ${{ env.DOCKER_HUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+            docker.io/${{ github.repository }}
+          labels: |
+            org.opencontainers.image.vendor=appleJuiceNETZ
+            org.opencontainers.image.url=https://applejuicenet.cc
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Publish multi-platform image to ghcr.io
+        env:
+          META_JSON: ${{ steps.meta.outputs.json }}
+        run: |
+          shopt -s nullglob
+          digests=(/tmp/digests/*)
+          test "${#digests[@]}" -eq 2
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          mapfile -t tags < <(jq -r --arg image "$image" '.tags[] | select(startswith($image + ":"))' <<< "$META_JSON")
+          test "${#tags[@]}" -gt 0
+          tag_args=()
+          digest_args=()
+          for tag in "${tags[@]}"; do tag_args+=(-t "$tag"); done
+          for digest in "${digests[@]}"; do digest_args+=("$image@sha256:${digest##*/}"); done
+          docker buildx imagetools create "${tag_args[@]}" "${digest_args[@]}"
+
+      - name: Copy multi-platform image to Docker Hub
+        if: env.DOCKER_HUB_USER != '' && env.DOCKER_HUB_TOKEN != ''
+        env:
+          META_JSON: ${{ steps.meta.outputs.json }}
+        run: |
+          image="docker.io/${GITHUB_REPOSITORY,,}"
+          mapfile -t tags < <(jq -r --arg image "$image" '.tags[] | select(startswith($image + ":"))' <<< "$META_JSON")
+          test "${#tags[@]}" -gt 0
+          for tag in "${tags[@]}"; do
+            source="ghcr.io/${GITHUB_REPOSITORY,,}:${tag##*:}"
+            docker buildx imagetools create -t "$tag" "$source"
+          done

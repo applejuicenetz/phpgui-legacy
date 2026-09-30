@@ -7,8 +7,8 @@
 ![Container-Build](https://github.com/applejuicenetz/phpgui-legacy/actions/workflows/container.yml/badge.svg)
 ![Docker-Hub-Pulls](https://img.shields.io/docker/pulls/applejuicenetz/phpgui)
 
-Die klassische appleJuice Client-GUI, geschrieben in PHP. Die Entwicklung basiert auf Version 0.28.1; Fehlerbehebungen erscheinen ab 0.28.2 in diesem Legacy-Repository.
-
+Die klassische appleJuice Client-GUI, geschrieben in PHP. 
+Die Entwicklung vor dem Layout-Update mit [0.29.0](https://github.com/applejuicenetz/phpgui);
 
 ## Abhängigkeiten
 
@@ -55,7 +55,7 @@ Zusätzlich kann manuell der URL-Parameter `&tab=NAME_DES_TAB` hinzugefügt werd
 
 ### docker run
 
-Der feste Release-Stand ist unter `ghcr.io/applejuicenetz/phpgui-legacy:0.28.2` und im regulären Paket unter `ghcr.io/applejuicenetz/phpgui:0.28.2` verfügbar. Der aktuelle Stand von `main` wird in beiden Paketen als `:legacy` veröffentlicht.
+Der feste Release-Stand ist unter `ghcr.io/applejuicenetz/phpgui-legacy:0.28.2` und im regulären Paket unter `ghcr.io/applejuicenetz/phpgui:legacy` verfügbar. Der aktuelle Stand von `main` wird in beiden Paketen als `:legacy` veröffentlicht.
 
 Container starten:
 
@@ -63,7 +63,7 @@ Container starten:
 docker run -d \
         -p 8080:80 \
         --name phpgui \
-        ghcr.io/applejuicenetz/phpgui:0.28.2
+        ghcr.io/applejuicenetz/phpgui:legacy
 ```
 
 optional: add `CORE_HOST` and/or `CORE_PORT` with your environment
@@ -76,17 +76,15 @@ docker run -d \
         -e "CORE_HOST=http://192.168.1.2" \
         -e "CORE_PORT=9851" \
         --name phpgui \
-        ghcr.io/applejuicenetz/phpgui:0.28.2
+        ghcr.io/applejuicenetz/phpgui:legacy
 ```
 
 ### docker-compose.yml
 
 ```yaml
-version: '3.9'
-
 services:
   php-gui:
-    image: ghcr.io/applejuicenetz/phpgui:0.28.2
+    image: ghcr.io/applejuicenetz/phpgui:legacy
     restart: always
     container_name: phpgui
     network_mode: bridge

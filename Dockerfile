@@ -1,4 +1,4 @@
-FROM php:8.4-apache
+FROM docker.io/php:8.4-apache
 
 ENV CORE_HOST="" \
     CORE_PORT=9851 \

@@ -26,6 +26,7 @@ if (isset($_GET['tab']) && in_array($_GET['tab'], $tabs, true)) {
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="Cache-Control" content="no-cache"/>
     <link rel="shortcut icon" href="../favicon.ico"/>
+    <script src="../js/protocol-handler.js"></script>
 
 </head>
 <frameset rows="70,*,30" border="0">

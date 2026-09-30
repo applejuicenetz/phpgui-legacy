@@ -52,6 +52,7 @@ Zusätzlich kann manuell der URL-Parameter `&tab=NAME_DES_TAB` hinzugefügt werd
 ### Exposed Ports
 
 - `80` - HTTP Port
+- `443` - HTTPS Port (Apache-Standardzertifikat; für den Browser-Protokollhandler ein vertrauenswürdiges Zertifikat verwenden)
 
 ### docker run
 
@@ -65,6 +66,15 @@ docker run -d \
         --name phpgui \
         ghcr.io/applejuicenetz/phpgui:legacy
 ```
+
+Für einen lokalen HTTPS-Test das geänderte Image selbst bauen und Port 443 veröffentlichen:
+
+```bash
+docker build -t phpgui-legacy:local .
+docker run -d -p 8080:80 -p 8443:443 --name phpgui-legacy phpgui-legacy:local
+```
+
+Der `web+ajfsp`-Handler wird nur über HTTPS registriert. Das Apache-Standardzertifikat ist selbstsigniert; für einen verlässlichen Browsertest ein vertrauenswürdiges Zertifikat oder einen HTTPS-Reverse-Proxy verwenden.
 
 optional: add `CORE_HOST` and/or `CORE_PORT` with your environment
 

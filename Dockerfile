@@ -12,8 +12,9 @@ ENV CORE_HOST="" \
     GUI_SHOW_SHARE=1
 
 RUN apt update && \
-    apt install -y --no-install-recommends libpng-dev \
+    apt install -y --no-install-recommends libpng-dev ssl-cert \
     && docker-php-ext-install gd opcache \
+    && a2enmod ssl && a2ensite default-ssl \
     && apt clean && \
     mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini" && \
     echo "variables_order=EGPCS" > /usr/local/etc/php/conf.d/phpaj.ini && \
@@ -24,6 +25,6 @@ RUN apt update && \
 
 COPY . /var/www/html/
 
-EXPOSE 80
+EXPOSE 80 443
 
 HEALTHCHECK --interval=60s --start-period=5s CMD curl -I --fail http://localhost:80 || exit 1

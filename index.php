@@ -3,7 +3,31 @@ header('Cache-Control: no-cache');
 header('Content-Type: text/html; charset=UTF-8');
 
 session_start();
-session_unset();
+
+$incomingLink = $_GET['ajfsp_link'] ?? null;
+if (is_string($incomingLink) &&
+    (strpos($incomingLink, 'web+ajfsp://') === 0 || strpos($incomingLink, 'ajfsp://') === 0)) {
+    header('Referrer-Policy: no-referrer');
+    header('Cache-Control: no-store');
+
+    if (empty($_SESSION['core_host'])) {
+        session_unset();
+    }
+
+    $_SESSION['ajfsp_link'] = strpos($incomingLink, 'web+ajfsp://') === 0
+        ? substr($incomingLink, 4)
+        : $incomingLink;
+
+    if (!empty($_SESSION['core_host'])) {
+        header('Location: main/index.php', true, 303);
+        exit;
+    }
+
+    header('Location: index.php', true, 303);
+    exit;
+} elseif (isset($_GET['logout']) || empty($_SESSION['ajfsp_link'])) {
+    session_unset();
+}
 
 require_once 'main/subs.php';
 require_once 'main/login.php';
@@ -15,6 +39,7 @@ require_once 'main/login.php';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <?php echo $_SESSION['stylesheet']; ?>
+    <script src="js/protocol-handler.js"></script>
     <style>
         select {
             width: 100%;

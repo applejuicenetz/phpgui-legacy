@@ -4,6 +4,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 
 ## 0.28.2
 
+- `web+ajfsp`-Protokollhandler für HTTPS ergänzt; Links werden nach der Anmeldung auch in der Legacy-GUI verarbeitet
 - Linkexport für freigegebene Dateien unter PHP 8 wiederhergestellt
 - „Links exportieren“ in der Share-Ansicht exportiert wieder alle freigegebenen Dateien
 - Gewählte Sprache beim Anmelden und auf den Folgeseiten beibehalten

@@ -1,14 +1,13 @@
-# appleJuice phpGUI
+# appleJuice phpGUI (Legacy)
 
-![](https://img.shields.io/github/release/applejuicenetz/phpgui.svg)
-![](https://img.shields.io/github/downloads/applejuicenetz/phpgui/total)
-![](https://img.shields.io/github/license/applejuicenetz/phpgui.svg)
+![Release](https://img.shields.io/github/v/release/applejuicenetz/phpgui-legacy)
+![Downloads](https://img.shields.io/github/downloads/applejuicenetz/phpgui-legacy/total)
+![Lizenz](https://img.shields.io/github/license/applejuicenetz/phpgui-legacy)
 
-![](https://github.com/applejuicenetz/phpgui/actions/workflows/container.yml/badge.svg)
-![](https://img.shields.io/docker/pulls/applejuicenetz/phpgui)
-![](https://img.shields.io/docker/image-size/applejuicenetz/phpgui)
+![Container-Build](https://github.com/applejuicenetz/phpgui-legacy/actions/workflows/container.yml/badge.svg)
+![Docker-Hub-Pulls](https://img.shields.io/docker/pulls/applejuicenetz/phpgui)
 
-appleJuice Client GUI geschrieben in PHP.
+Die klassische appleJuice Client-GUI, geschrieben in PHP. Die Entwicklung basiert auf Version 0.28.1; Fehlerbehebungen erscheinen ab 0.28.2 in diesem Legacy-Repository.
 
 
 ## Abhängigkeiten
@@ -56,13 +55,15 @@ Zusätzlich kann manuell der URL-Parameter `&tab=NAME_DES_TAB` hinzugefügt werd
 
 ### docker run
 
-create and run `phpgui` container with the following command
+Der Legacy-Container ist unter `ghcr.io/applejuicenetz/phpgui-legacy:0.28.2` und als versionierter Tag im regulären Paket `ghcr.io/applejuicenetz/phpgui:0.28.2` verfügbar.
+
+Container starten:
 
 ```bash
 docker run -d \
         -p 8080:80 \
         --name phpgui \
-        ghcr.io/applejuicenetz/phpgui:latest
+        ghcr.io/applejuicenetz/phpgui:0.28.2
 ```
 
 optional: add `CORE_HOST` and/or `CORE_PORT` with your environment
@@ -75,7 +76,7 @@ docker run -d \
         -e "CORE_HOST=http://192.168.1.2" \
         -e "CORE_PORT=9851" \
         --name phpgui \
-        ghcr.io/applejuicenetz/phpgui:latest
+        ghcr.io/applejuicenetz/phpgui:0.28.2
 ```
 
 ### docker-compose.yml
@@ -85,7 +86,7 @@ version: '3.9'
 
 services:
   php-gui:
-    image: ghcr.io/applejuicenetz/phpgui:latest
+    image: ghcr.io/applejuicenetz/phpgui:0.28.2
     restart: always
     container_name: phpgui
     network_mode: bridge

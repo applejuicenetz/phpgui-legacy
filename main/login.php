@@ -5,8 +5,9 @@ $languages = dirlisting(__DIR__ . '/../language', 'xml');
 
 if (!empty($_GET['c_lang']) && array_key_exists($_GET['c_lang'] . '.xml', $languages)) {
     $_SESSION['language']['name'] = $_GET['c_lang'];
-} else {
-    $_SESSION['language']['name'] = ($_ENV['GUI_LANGUAGE'] ?: 'deutsch');
+} elseif (empty($_SESSION['language']['name']) || !array_key_exists($_SESSION['language']['name'] . '.xml', $languages)) {
+    $defaultLanguage = $_ENV['GUI_LANGUAGE'] ?: 'deutsch';
+    $_SESSION['language']['name'] = array_key_exists($defaultLanguage . '.xml', $languages) ? $defaultLanguage : 'deutsch';
 }
 
 $language_file = file_get_contents(__DIR__ . '/../language/' . $_SESSION['language']['name'] . '.xml');

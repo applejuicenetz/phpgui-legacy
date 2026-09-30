@@ -79,7 +79,7 @@ require_once 'main/login.php';
         Code by UP &middot; maintained by <a href="https://github.com/applejuicenetz/" target="_blank">appleJuiceNETZ</a>
     </div>
     <div class="authors">
-        <a href="https://github.com/applejuicenetz/phpgui" target="_blank"><?php echo PHP_GUI_VERSION; ?></a>
+        <a href="https://github.com/applejuicenetz/phpgui-legacy" target="_blank"><?php echo PHP_GUI_VERSION; ?></a>
     </div>
 </div>
 </body>

@@ -1,102 +1,109 @@
-# Changelog
+# Änderungsprotokoll
 
-All notable changes to this project will be documented in this file.
+Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
+
+## 0.28.2
+
+- Linkexport für freigegebene Dateien unter PHP 8 wiederhergestellt
+- „Links exportieren“ in der Share-Ansicht exportiert wieder alle freigegebenen Dateien
+- Docker-Basisimage auf PHP 8.4 festgelegt und Container-Build auf natives AMD64 und ARM64 umgestellt
+- Versioniertes Container-Image auch im regulären PHPGUI-Paket veröffentlicht
+- README und Dependabot-Konfiguration für das Legacy-Repository angepasst
 
 ## 0.28.1
 
-- fix style switcher
+- Design-Umschalter korrigiert
 
 ## 0.28.0
 
-- php 8 adaptations
-- fix memory overflow on large shares
+- Anpassungen für PHP 8 vorgenommen
+- Speicherüberlauf bei großen Shares behoben
 
 ## 0.27.10
 
-- revert back to PHP 7 in docker image
+- Docker-Image wieder auf PHP 7 umgestellt
 
 ## 0.27.9
 
-- set php `memory_limit` to `-1` in docker container
-- `phpinfo` plugin
-- use PHP 8 as base docker image
-- install php `opcache` extension for better performance
+- PHP-Wert memory_limit im Docker-Container auf -1 gesetzt
+- phpinfo-Plugin ergänzt
+- PHP 8 als Basis des Docker-Images verwendet
+- PHP-Erweiterung opcache für bessere Leistung installiert
 
 ## 0.27.8
 
-- alphabetical ordering in files view
+- Dateien in der Dateiansicht alphabetisch sortiert
 
 ## 0.27.7
 
-- restore gd stuff for partlist
+- GD-Funktionen für die Teilliste wiederhergestellt
 
 ## 0.27.6
 
-- correct rel info url
+- RelInfo-URL korrigiert
 
 ## 0.27.5
 
-- make `NEWS_URL` configurable
-- make `SERVERLIST_URL` configurable
-- get GUI NEWS from Github
+- NEWS_URL und SERVERLIST_URL konfigurierbar gemacht
+- GUI-Nachrichten von GitHub bezogen
 
 ## 0.27.4
 
-- set default `error_reporting` to `0` (can be changed with `PHP_INI_ERROR_REPORTING`)
-- set default `display_errors` to `Off` (can be changed with `PHP_INI_DISPLAY_ERRORS`)
+- Standardwert für error_reporting auf 0 gesetzt; über PHP_INI_ERROR_REPORTING änderbar
+- Standardwert für display_errors auf Off gesetzt; über PHP_INI_DISPLAY_ERRORS änderbar
 
 ## 0.27.3
 
-- allow tab selection in perma link
+- Auswahl eines Tabs im Permalink ermöglicht
 
 ## 0.27.2
 
-- fix permalink usage
+- Verwendung von Permalinks korrigiert
 
 ## 0.27.1
 
-- fix relinfo link builder
+- Erstellung von RelInfo-Links korrigiert
 
 ## 0.27.0
 
-- add back a simplified RelInfo Icon in `downloads`, `uploads`, `share` and `search` view
-- add `permalink` on top Bar
-- load http files with `file_get_contents` instead of `fsockopen`
-- refactor code and style of `/index.php` for better readability
-- removed `minigui`
+- Vereinfachtes RelInfo-Symbol in den Ansichten für Downloads, Uploads, Shares und Suche wieder ergänzt
+- Permalink in der oberen Leiste ergänzt
+- HTTP-Dateien mit file_get_contents statt fsockopen geladen
+- Code und Gestaltung von /index.php für bessere Lesbarkeit überarbeitet
+- minigui entfernt
 
 ## 0.26.0
 
-- document `ENV` variables for docker
-- remove phpaj `savebw` option
-- remove phpaj downloads `autoclean` option
-- remove now useless phpaj options from settings view
-- allow progressbar configuration from ENV
-- allow auto login in `top` frame
+- Umgebungsvariablen für Docker dokumentiert
+- phpaj-Option savebw entfernt
+- phpaj-Option autoclean für Downloads entfernt
+- Nicht mehr benötigte phpaj-Optionen aus den Einstellungen entfernt
+- Konfiguration der Fortschrittsbalken über Umgebungsvariablen ermöglicht
+- Automatische Anmeldung im oberen Frame ermöglicht
 
 ## 0.25.5
 
-- add ability to handle multiple links
+- Verarbeitung mehrerer Links ermöglicht
 
 ## 0.25.4
 
-- fix link exporter (AJL and BB-Code)
+- Linkexport für AJL und BB-Code korrigiert
 
 ## 0.25.3
 
-- switch from `fsockopen` to `curl` for all core requests (faster)
+- Für alle Core-Anfragen von fsockopen auf das schnellere curl umgestellt
 
 ## 0.25.2
 
-- remove PopUps on link export
+- Pop-ups beim Linkexport entfernt
 
 ## 0.25.1
 
-- fix minigui for PHP 7.X
+- minigui für PHP 7.x korrigiert
 
 ## 0.25.0
 
-- import project into VCS
-- make Code PHP 7.X compatible
-- add Docker support
-- remove outdated `appledocs` implementation
+- Projekt in die Versionsverwaltung importiert
+- Code mit PHP 7.x kompatibel gemacht
+- Docker-Unterstützung ergänzt
+- Veraltete Implementierung von appledocs entfernt

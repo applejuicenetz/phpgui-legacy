@@ -37,7 +37,7 @@ function newshare(){
 }
 
 function share_export(){
-    window.location.href = 'shareexport.php';
+    window.location.href = 'shareexport.php?all=1';
 }
 
 function select_dir(){

@@ -27,15 +27,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Use PHP 8.4 base image
-        run: sed -i 's|^FROM php:8-apache$|FROM php:8.4-apache|' Dockerfile
-
       - name: Login to ghcr.io
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ vars.GHCR_USER || secrets.GHCR_USER || github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
 
       - name: Docker meta
         id: meta
@@ -44,6 +41,9 @@ jobs:
           images: |
             ghcr.io/${{ github.repository }}
             docker.io/${{ github.repository }}
+          tags: |
+            type=raw,value=0.28.2,enable=${{ github.event_name != 'release' }}
+            type=ref,event=tag
           labels: |
             org.opencontainers.image.vendor=appleJuiceNETZ
             org.opencontainers.image.url=https://applejuicenet.cc
@@ -86,7 +86,7 @@ jobs:
       contents: read
       packages: write
     env:
-      DOCKER_HUB_USER: ${{ secrets.DOCKER_HUB_USER }}
+      DOCKER_HUB_USER: ${{ vars.DOCKER_HUB_USER || secrets.DOCKER_HUB_USER }}
       DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
     steps:
       - name: Download image digests
@@ -100,8 +100,8 @@ jobs:
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+          username: ${{ vars.GHCR_USER || secrets.GHCR_USER || github.actor }}
+          password: ${{ secrets.GHCR_TOKEN || github.token }}
 
       - name: Login to Docker Hub
         if: env.DOCKER_HUB_USER != '' && env.DOCKER_HUB_TOKEN != ''
@@ -117,6 +117,9 @@ jobs:
           images: |
             ghcr.io/${{ github.repository }}
             docker.io/${{ github.repository }}
+          tags: |
+            type=raw,value=0.28.2,enable=${{ github.event_name != 'release' }}
+            type=ref,event=tag
           labels: |
             org.opencontainers.image.vendor=appleJuiceNETZ
             org.opencontainers.image.url=https://applejuicenet.cc
@@ -140,6 +143,14 @@ jobs:
           for digest in "${digests[@]}"; do digest_args+=("$image@sha256:${digest##*/}"); done
           docker buildx imagetools create "${tag_args[@]}" "${digest_args[@]}"
 
+      - name: Copy versioned image to regular phpgui package
+        env:
+          VERSION_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || '0.28.2' }}
+        run: |
+          source="ghcr.io/${GITHUB_REPOSITORY,,}:$VERSION_TAG"
+          target="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/phpgui:$VERSION_TAG"
+          docker buildx imagetools create -t "$target" "$source"
+
       - name: Copy multi-platform image to Docker Hub
         if: env.DOCKER_HUB_USER != '' && env.DOCKER_HUB_TOKEN != ''
         env:
@@ -151,4 +162,6 @@ jobs:
           for tag in "${tags[@]}"; do
             source="ghcr.io/${GITHUB_REPOSITORY,,}:${tag##*:}"
             docker buildx imagetools create -t "$tag" "$source"
+            regular="docker.io/${GITHUB_REPOSITORY_OWNER,,}/phpgui:${tag##*:}"
+            docker buildx imagetools create -t "$regular" "$source"
           done

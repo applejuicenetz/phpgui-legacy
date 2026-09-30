@@ -2,7 +2,17 @@
 session_start();
 require_once "subs.php";
 require_once "classes/class_core.php";
+require_once "classes/class_share.php";
 $core = new Core;
+
+if (!empty($_GET['all'])) {
+    $share = new Share();
+    $share->refresh_cache(60);
+    $_SESSION['shareexport'] = [];
+    foreach (array_keys($share->cache['SHARES']['VALUES']['SHARE'] ?? []) as $id) {
+        $_SESSION['shareexport'][] = $share->get_file($id)['LINK'];
+    }
+}
 
 echo writehead('Share-Export');
 echo $_SESSION['stylesheet'];
@@ -23,18 +33,18 @@ echo "<input name=\"withsource\" type=\"checkbox\" value=\"1\" "
 if(!empty($_GET['withsource']) && $_GET['withsource']=="true")
 	echo " checked=\"checked\"";
 echo " /> ";
-$exportf = dirlisting("../export","php");
-for($i=0;$i<count($exportf[0]);$i++){
-	echo "<input type=\"button\" value=\"".$exportf[1][$i]
+$exportf = array_values(dirlisting("../export","php"));
+foreach ($exportf as $format) {
+	echo "<input type=\"button\" value=\"".$format
 		."\" onclick=\"document.location.href='".$_SERVER['PHP_SELF']."?exp_format="
-		.$exportf[1][$i]
+		.$format
 		."&amp;withsource='+document.exportform.withsource.checked+'&amp;"
 		.SID."';\" />";
 }
 
 echo "<br /><textarea cols=\"90\" rows=\"16\" wrap=\"off\">";
 if(!empty($_SESSION['shareexport'])){
-	if(!in_array($_GET['exp_format'],$exportf[1]))
+	if(!in_array($_GET['exp_format'],$exportf, true))
 		$_GET['exp_format']="Default";
 	require_once "../export/".$_GET['exp_format'].".php";
 	if(!empty($_GET['withsource']) && $_GET['withsource']=="true"){
@@ -80,4 +90,3 @@ echo "<input type=\"button\" value=\""
 echo "</form>
 </body>
 </html>";
-

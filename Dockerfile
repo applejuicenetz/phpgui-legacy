@@ -17,7 +17,9 @@ ENV CORE_HOST="" \
     GUI_SHOW_NEWS=1 \
     GUI_SHOW_SHARE=1 \
     WEB_DOCUMENT_ROOT=/var/www/html \
-    PHP_MEMORY_LIMIT=-1
+    PHP_MEMORY_LIMIT=-1 \
+    LOG_STDOUT=/dev/stdout \
+    LOG_STDERR=/dev/stderr
 
 RUN echo "variables_order=EGPCS" > /usr/local/etc/php/conf.d/zz-phpaj.ini
 

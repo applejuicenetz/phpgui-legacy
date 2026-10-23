@@ -8,6 +8,9 @@ on:
     types: [ released ]
   workflow_dispatch:
 
+env:
+  IMAGE: ${{ github.repository_owner }}/phpgui
+
 jobs:
   build:
     strategy:
@@ -39,8 +42,8 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            ghcr.io/${{ github.repository }}
-            docker.io/${{ github.repository }}
+            ghcr.io/${{ env.IMAGE }}
+            docker.io/${{ env.IMAGE }}
           flavor: |
             latest=false
           tags: |
@@ -63,7 +66,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=legacy-${{ matrix.arch }}
           cache-to: type=gha,scope=legacy-${{ matrix.arch }},mode=max
-          outputs: type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=ghcr.io/${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
 
       - name: Export image digest
         env:
@@ -117,8 +120,8 @@ jobs:
         uses: docker/metadata-action@v6
         with:
           images: |
-            ghcr.io/${{ github.repository }}
-            docker.io/${{ github.repository }}
+            ghcr.io/${{ env.IMAGE }}
+            docker.io/${{ env.IMAGE }}
           flavor: |
             latest=false
           tags: |
@@ -138,7 +141,7 @@ jobs:
           shopt -s nullglob
           digests=(/tmp/digests/*)
           test "${#digests[@]}" -eq 2
-          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          image="ghcr.io/${IMAGE,,}"
           mapfile -t tags < <(jq -r --arg image "$image" '.tags[] | select(startswith($image + ":"))' <<< "$META_JSON")
           test "${#tags[@]}" -gt 0
           tag_args=()
@@ -147,25 +150,15 @@ jobs:
           for digest in "${digests[@]}"; do digest_args+=("$image@sha256:${digest##*/}"); done
           docker buildx imagetools create "${tag_args[@]}" "${digest_args[@]}"
 
-      - name: Copy image to regular phpgui package
-        env:
-          VERSION_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'legacy' }}
-        run: |
-          source="ghcr.io/${GITHUB_REPOSITORY,,}:$VERSION_TAG"
-          target="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/phpgui:$VERSION_TAG"
-          docker buildx imagetools create -t "$target" "$source"
-
       - name: Copy multi-platform image to Docker Hub
         if: env.DOCKER_HUB_USER != '' && env.DOCKER_HUB_TOKEN != ''
         env:
           META_JSON: ${{ steps.meta.outputs.json }}
         run: |
-          image="docker.io/${GITHUB_REPOSITORY,,}"
+          image="docker.io/${IMAGE,,}"
           mapfile -t tags < <(jq -r --arg image "$image" '.tags[] | select(startswith($image + ":"))' <<< "$META_JSON")
           test "${#tags[@]}" -gt 0
           for tag in "${tags[@]}"; do
-            source="ghcr.io/${GITHUB_REPOSITORY,,}:${tag##*:}"
+            source="ghcr.io/${IMAGE,,}:${tag##*:}"
             docker buildx imagetools create -t "$tag" "$source"
-            regular="docker.io/${GITHUB_REPOSITORY_OWNER,,}/phpgui:${tag##*:}"
-            docker buildx imagetools create -t "$regular" "$source"
           done

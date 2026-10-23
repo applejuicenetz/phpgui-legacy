@@ -20,7 +20,7 @@ class Plugin
         }
     }
 
-    function register($name, $icon = "", $filename)
+    function register($name, $icon, $filename)
     {
         $this->liste[] = [$name, $icon, $filename];
     }

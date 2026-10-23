@@ -1,4 +1,10 @@
-FROM docker.io/php:8.4-apache
+# Basis webdevops/php-apache (Alpine, PHP 8.3, amd64+arm64). Apache laeuft auch auf Kernel < 3.17
+# (z.B. Synology DS2415+, 3.10); die offiziellen php:*-apache Images (Debian >= bullseye) brechen dort
+# mit "AH00141: Could not initialize random number generator" ab.
+# prod (letzte Stage = Default-Target im Workflow): nur HTTP, mod_ssl braucht getrandom() und ist entfernt.
+# dev: HTTPS auf Port 443 mit dem selbstsignierten Zertifikat des Basis-Images; nur auf modernen Kerneln.
+ARG PHP_TAG=8.3-alpine
+FROM docker.io/webdevops/php-apache:${PHP_TAG} AS base
 
 ENV CORE_HOST="" \
     CORE_PORT=9851 \
@@ -9,22 +15,23 @@ ENV CORE_HOST="" \
     GUI_REFRESH_UPLOADS=30 \
     GUI_REFRESH_SEARCH=30 \
     GUI_SHOW_NEWS=1 \
-    GUI_SHOW_SHARE=1
+    GUI_SHOW_SHARE=1 \
+    WEB_DOCUMENT_ROOT=/var/www/html \
+    PHP_MEMORY_LIMIT=-1
 
-RUN apt update && \
-    apt install -y --no-install-recommends libpng-dev ssl-cert \
-    && docker-php-ext-install gd opcache \
-    && a2enmod ssl && a2ensite default-ssl \
-    && apt clean && \
-    mv "${PHP_INI_DIR}/php.ini-production" "${PHP_INI_DIR}/php.ini" && \
-    echo "variables_order=EGPCS" > /usr/local/etc/php/conf.d/phpaj.ini && \
-    echo "memory_limit=-1" >> /usr/local/etc/php/conf.d/phpaj.ini && \
-    ln -sf /dev/null /var/log/apache2/access.log && \
-    ln -sf /dev/null /var/log/apache2/error.log && \
-    ln -sf /dev/null /var/log/apache2/other_vhosts_access.log
+RUN echo "variables_order=EGPCS" > /usr/local/etc/php/conf.d/zz-phpaj.ini
+
+FROM base AS dev
+
+EXPOSE 80 443
+
+FROM base AS prod
+
+# vhost.ssl.conf wird von vhost.conf eingebunden: leeren statt loeschen, sonst bricht Apache mit Syntax error ab.
+RUN rm -f /etc/apache2/conf.d/ssl.conf && : > /opt/docker/etc/httpd/vhost.ssl.conf
 
 COPY . /var/www/html/
 
-EXPOSE 80 443
+EXPOSE 80
 
 HEALTHCHECK --interval=60s --start-period=5s CMD curl -I --fail http://localhost:80 || exit 1

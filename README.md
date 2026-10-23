@@ -12,7 +12,7 @@ Die Entwicklung vor dem Layout-Update mit [0.29.0](https://github.com/applejuice
 
 ## Abhängigkeiten
 
-Es wird mindestens PHP `7.4.0` benötigt!
+Es wird mindestens PHP `8.3` benötigt! Das Docker-Image basiert auf PHP `8.3`.
 
 
 ## Konfiguration (nur bei selbst hosting ohne Docker)
@@ -20,31 +20,31 @@ Es wird mindestens PHP `7.4.0` benötigt!
 Die Datei `.env.dist` kopieren, zu `.env` umbenennen und mit einem Texteditor die gewünschte Konfiguration vornehmen.
 
 
-## auto login via url
+## Auto-Login per URL
 
 Zwischen dem `Core Beenden` und `Logout` Button befindet sich eine `Permalink` Button.
 Dieser kann als Lesezeichen gesetzt werden und logt dich automatisch in den gerade eingeloggten Core ein.
 
 Zusätzlich kann manuell der URL-Parameter `&tab=NAME_DES_TAB` hinzugefügt werden, um bspw. direkt in den `downloads` oder `uploads` Tab zu springen.
 
-### Environment Variables
+### Umgebungsvariablen
 
-| Variable                | Value                | Description                                |
-|-------------------------|----------------------|--------------------------------------------|
-| `CORE_HOST`             | `http://192.168.2.1` | IP/HOST where Core is running, with scheme |
-| `CORE_PORT`             | `9851`               | Core XML Port                              |
-| `GUI_LANGUAGE`          | `deutsch`            | `deutsch` or `englisch`                    |
-| `GUI_STYLE`             | `tango`              | style name (view styles folder)            |
-| `GUI_REFRESH_STATUS`    | `10`                 | refresh `status bar` in seconds            |
-| `GUI_REFRESH_DOWNLOADS` | `30`                 | refresh `downloads` view in seconds        |
-| `GUI_REFRESH_UPLOADS`   | `30`                 | refresh `uploads` view in seconds          |
-| `GUI_REFRESH_SEARCH`    | `30`                 | refresh `search` view in seconds           |
-| `GUI_SHOW_NEWS`         | `1`                  | show news on `status page`                 |
-| `GUI_SHOW_SHARE`        | `1`                  | show share stats on `status page`          |
-| `TOP_SHOW_PERMALINK`    | `1`                  | show `Perma Link` in Top Navbar            |
-| `NEWS_URL`              | `http://XY`          | url where to get news from                 |
-| `SERVERLIST_URL`        | `http://ABC`         | url where to find new servers              |
-| `REL_INFO`              | `http://MN/ajfps/%s` | set them to empty to disable rel info col  |
+| Variable                | Wert                 | Beschreibung                                           |
+|-------------------------|----------------------|--------------------------------------------------------|
+| `CORE_HOST`             | `http://192.168.2.1` | IP/Host, auf dem der Core läuft, mit Schema            |
+| `CORE_PORT`             | `9851`               | XML-Port des Cores                                     |
+| `GUI_LANGUAGE`          | `deutsch`            | `deutsch` oder `englisch`                              |
+| `GUI_STYLE`             | `tango`              | Name des Styles (siehe Ordner `style`)                 |
+| `GUI_REFRESH_STATUS`    | `10`                 | `Statusleiste` alle n Sekunden aktualisieren           |
+| `GUI_REFRESH_DOWNLOADS` | `30`                 | Ansicht `downloads` alle n Sekunden aktualisieren      |
+| `GUI_REFRESH_UPLOADS`   | `30`                 | Ansicht `uploads` alle n Sekunden aktualisieren        |
+| `GUI_REFRESH_SEARCH`    | `30`                 | Ansicht `search` alle n Sekunden aktualisieren         |
+| `GUI_SHOW_NEWS`         | `1`                  | News auf der `Statusseite` anzeigen                    |
+| `GUI_SHOW_SHARE`        | `1`                  | Share-Statistik auf der `Statusseite` anzeigen         |
+| `TOP_SHOW_PERMALINK`    | `1`                  | `Perma Link` in der oberen Navigationsleiste anzeigen  |
+| `NEWS_URL`              | `http://XY`          | URL, von der die News geladen werden                   |
+| `SERVERLIST_URL`        | `http://ABC`         | URL, unter der neue Server gefunden werden             |
+| `REL_INFO`              | `http://MN/ajfps/%s` | leer setzen, um die Spalte mit Release-Infos zu entfernen |
 
 
 ## Docker
@@ -52,11 +52,10 @@ Zusätzlich kann manuell der URL-Parameter `&tab=NAME_DES_TAB` hinzugefügt werd
 ### Exposed Ports
 
 - `80` - HTTP Port
-- `443` - HTTPS Port (Apache-Standardzertifikat; für den Browser-Protokollhandler ein vertrauenswürdiges Zertifikat verwenden)
 
 ### docker run
 
-Der feste Release-Stand ist unter `ghcr.io/applejuicenetz/phpgui-legacy:0.28.2` und im regulären Paket unter `ghcr.io/applejuicenetz/phpgui:legacy` verfügbar. Der aktuelle Stand von `main` wird in beiden Paketen als `:legacy` veröffentlicht.
+Der feste Release-Stand ist unter `ghcr.io/applejuicenetz/phpgui:0.28.2` verfügbar. Der aktuelle Stand von `main` wird als `ghcr.io/applejuicenetz/phpgui:legacy` veröffentlicht.
 
 Container starten:
 
@@ -67,18 +66,9 @@ docker run -d \
         ghcr.io/applejuicenetz/phpgui:legacy
 ```
 
-Für einen lokalen HTTPS-Test das geänderte Image selbst bauen und Port 443 veröffentlichen:
+optional: `CORE_HOST` und/oder `CORE_PORT` per Umgebungsvariable setzen
 
-```bash
-docker build -t phpgui-legacy:local .
-docker run -d -p 8080:80 -p 8443:443 --name phpgui-legacy phpgui-legacy:local
-```
-
-Der `web+ajfsp`-Handler wird nur über HTTPS registriert. Das Apache-Standardzertifikat ist selbstsigniert; für einen verlässlichen Browsertest ein vertrauenswürdiges Zertifikat oder einen HTTPS-Reverse-Proxy verwenden.
-
-optional: add `CORE_HOST` and/or `CORE_PORT` with your environment
-
-eg.
+z. B.
 
 ```bash
 docker run -d \

@@ -11,6 +11,7 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 - Docker-Basisimage auf PHP 8.4 festgelegt und Container-Build auf natives AMD64 und ARM64 umgestellt
 - Versioniertes Container-Image auch im regulären PHPGUI-Paket veröffentlicht
 - README und Dependabot-Konfiguration für das Legacy-Repository angepasst
+- Docker-Image mit PHP 8.3 läuft auch auf alten Kerneln (z. B. Synology DSM 7+)
 
 ## 0.28.1 (2023-12-07)
 

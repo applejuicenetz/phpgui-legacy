@@ -3,8 +3,8 @@
  * HIER KEINE ÄNDERUNG DURCHFÜHREN!
  * Kopiere die ".env.dist" Datei zu ".env" und konfiguriere dort das GUI!
  */
-if (!version_compare(PHP_VERSION, '7.4')) {
-    die('PHP 7.4 required, used: -> ' . PHP_VERSION);
+if (version_compare(PHP_VERSION, '8.3', '<')) {
+    die('PHP 8.3 required, used: -> ' . PHP_VERSION);
 }
 
 if (file_exists('.env')) {
